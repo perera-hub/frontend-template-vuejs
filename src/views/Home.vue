@@ -1,18 +1,61 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
+    <p>{{weatherInformation}}</p>
+    <hr>
+    <p>{{employeeInformation}}</p>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+import { employeeAPIClient, weatherAPIClient } from '../remote-service-access/http-clients'
 
 export default {
   name: 'Home',
-  components: {
-    HelloWorld
+
+  data () {
+    return {
+      weatherInformation: 'No Data Yet',
+      employeeInformation: 'No Data Yet'
+    }
+  },
+
+  created () {
+    var self = this
+    weatherAPIClient.get('weather', {
+      params: {
+        id: '2172797',
+        units: '%22metric%22 or %22imperial%22',
+        mode: 'xml%2C html',
+        q: 'Colombo'
+      }
+    }).then(function (response) {
+      console.log(response)
+      self.weatherInformation = response.data
+    }).catch(function (error) {
+      self.defaultHTTPErrorHandler(error, self.weatherInformation)
+    })
+
+    employeeAPIClient.get('employees')
+      .then(function (response) {
+        console.log(response)
+        self.employeeInformation = response.data
+      }).catch(function (error) {
+        self.defaultHTTPErrorHandler(error, self.employeeInformation)
+      })
+  },
+
+  methods: {
+    defaultHTTPErrorHandler (error, messageHolder) {
+      if (error.response) {
+        messageHolder = 'Server Error: ' + error.response.status + ' : ' + JSON.stringify(error.response.data)
+      } else if (error.request) {
+        messageHolder = 'Could send request to server: ' + error.message
+      } else {
+        messageHolder = 'Something went wrong: ' + error.message
+      }
+    }
   }
 }
 </script>
