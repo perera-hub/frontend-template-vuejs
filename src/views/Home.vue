@@ -4,12 +4,15 @@
     <p>{{weatherInformation}}</p>
     <hr>
     <p>{{employeeInformation}}</p>
+    <hr>
+    <p>{{restaurants}}</p>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
 import { employeeAPIClient, weatherAPIClient } from '../remote-service-access/http-clients'
+import { defaultFirestore } from '../remote-service-access/firebase-clients'
 
 export default {
   name: 'Home',
@@ -17,7 +20,8 @@ export default {
   data () {
     return {
       weatherInformation: 'No Data Yet',
-      employeeInformation: 'No Data Yet'
+      employeeInformation: 'No Data Yet',
+      restaurants: []
     }
   },
 
@@ -44,6 +48,14 @@ export default {
       }).catch(function (error) {
         self.defaultHTTPErrorHandler(error, self.employeeInformation)
       })
+
+    defaultFirestore.collection('restaurants').onSnapshot((resCollection) => {
+      resCollection.forEach((res) => {
+        var element = res.data()
+        element.id = res.id
+        this.restaurants.push(element)
+      })
+    })
   },
 
   methods: {

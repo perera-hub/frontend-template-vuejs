@@ -1,3 +1,4 @@
+import appConfig from '../../../public/config'
 import axios from 'axios'
 
 /**
@@ -11,7 +12,7 @@ import axios from 'axios'
  */
 export const weatherAPIClient = axios.create(
   {
-    baseURL: 'https://community-open-weather-map.p.rapidapi.com/',
+    baseURL: appConfig.weatherAPIConfig.baseURL,
     timeout: 2000,
     headers: {
       'x-rapidapi-host': 'community-open-weather-map.p.rapidapi.com',
